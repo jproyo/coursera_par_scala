@@ -43,7 +43,8 @@ class KMeans {
   }
 
   def classify(points: GenSeq[Point], means: GenSeq[Point]): GenMap[Point, GenSeq[Point]] = {
-    ???
+    if(points.isEmpty) means.groupBy( p => p ).map(p => p._1 -> GenSeq())
+    else points.groupBy(p => findClosest(p, means))
   }
 
   def findAverage(oldMean: Point, points: GenSeq[Point]): Point = if (points.length == 0) oldMean else {
@@ -58,17 +59,18 @@ class KMeans {
     new Point(x / points.length, y / points.length, z / points.length)
   }
 
-  def update(classified: GenMap[Point, GenSeq[Point]], oldMeans: GenSeq[Point]): GenSeq[Point] = {
-    ???
-  }
+  def update(classified: GenMap[Point, GenSeq[Point]], oldMeans: GenSeq[Point]): GenSeq[Point] =
+    oldMeans.map( p => findAverage(p, classified(p)))
 
-  def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean = {
-    ???
-  }
+
+  def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean =
+    oldMeans.zipWithIndex.filterNot( p => p._1.squareDistance(newMeans(p._2)) <= eta).isEmpty
 
   @tailrec
   final def kMeans(points: GenSeq[Point], means: GenSeq[Point], eta: Double): GenSeq[Point] = {
-    if (???) kMeans(???, ???, ???) else ??? // your implementation need to be tail recursive
+    val meansPoints = classify(points, means)
+    val updatedMeans = update(meansPoints, means)
+    if (converged(eta)(means, updatedMeans)) kMeans(points, updatedMeans, eta) else updatedMeans
   }
 }
 
