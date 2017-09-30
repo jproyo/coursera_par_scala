@@ -64,13 +64,13 @@ class KMeans {
 
 
   def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean =
-    oldMeans.zipWithIndex.filterNot( p => p._1.squareDistance(newMeans(p._2)) <= eta).isEmpty
+    (oldMeans.zip(newMeans)).forall{ case (oMean, nMean) =>  oMean.squareDistance(nMean) <= eta }
 
   @tailrec
   final def kMeans(points: GenSeq[Point], means: GenSeq[Point], eta: Double): GenSeq[Point] = {
     val meansPoints = classify(points, means)
     val updatedMeans = update(meansPoints, means)
-    if (converged(eta)(means, updatedMeans)) kMeans(points, updatedMeans, eta) else updatedMeans
+    if (!converged(eta)(means, updatedMeans)) kMeans(points, updatedMeans, eta) else updatedMeans
   }
 }
 

@@ -92,9 +92,9 @@ class IndexedColorFilter(initialImage: Img,
     var sound = 0.0
     var noise = 0.0
 
-    for (point <- points) {
+    for (point <- points.par) {
       import math.{pow, sqrt}
-      val closest = findClosest(point, means)
+      val closest = findClosest(point, means.par)
       sound += sqrt(pow(point.x, 2) + pow(point.y, 2) + pow(point.z, 2))
       noise += sqrt(pow(point.x - closest.x, 2) + pow(point.y - closest.y, 2) + pow(point.z - closest.z, 2))
     }
@@ -107,7 +107,7 @@ class IndexedColorFilter(initialImage: Img,
       case ConvergedAfterNSteps(n) =>
         steps >= n
       case ConvergedAfterMeansAreStill(eta) =>
-        super.converged(eta)(oldMeans, newMeans)
+        super.converged(eta)(oldMeans.par, newMeans.par)
       case ConvergedWhenSNRAbove(snr_desired) =>
         val snr_computed = computeSNR(points, newMeans)
         snr_computed >= snr_desired
